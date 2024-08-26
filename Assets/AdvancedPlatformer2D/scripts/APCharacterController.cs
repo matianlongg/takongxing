@@ -1,5 +1,6 @@
 /* Copyright (c) 2014 Advanced Platformer 2D */
 using UnityEngine;
+using Terresquall;
 using System.Collections.Generic;
 
 
@@ -205,6 +206,8 @@ public partial class APCharacterController : MonoBehaviour
     // edge grab
     GameObject m_edgeGrabSensor;
 
+	private VirtualJoystick virtualJoystick;
+
 	// Use this for initialization
 	void Awake()
 	{
@@ -225,6 +228,16 @@ public partial class APCharacterController : MonoBehaviour
             m_edgeGrabSensor.transform.parent = this.transform;
             m_edgeGrabSensor.transform.localPosition = Vector3.zero;
         }
+	}
+
+	void Start()
+	{
+		virtualJoystick = FindObjectOfType<VirtualJoystick>();
+
+		if (virtualJoystick == null)
+		{
+			Debug.LogError("VirtualJoystick instance not found. Please ensure it exists in the scene.");
+		}
 	}
 
 	void OnDisable()
@@ -1224,12 +1237,28 @@ public partial class APCharacterController : MonoBehaviour
 		m_sliding = false;
 
 		float maxSpeed = ComputeMaxSpeed();
-		float absAxisX = Mathf.Abs(m_inputs.m_axisX.GetValue());
+
+		// 获取键盘输入的X轴值
+		float keyboardAxisX = m_inputs.m_axisX.GetValue();
+
+		// 获取摇杆输入的X轴值
+		float joystickAxisX = 0f;
+		if (FindObjectOfType<JoystickController>() != null)
+		{
+			// 使用 Virtual Joystick 的输入值作为摇杆的输入
+			joystickAxisX = VirtualJoystick.GetAxis("Horizontal");
+		}
+		 // 合并输入值，优先使用摇杆输入
+		float inputAxisX = Mathf.Abs(joystickAxisX) > Mathf.Epsilon ? joystickAxisX : keyboardAxisX;
+		float absAxisX = Mathf.Abs(inputAxisX);
+
+		// float absAxisX = Mathf.Abs(m_inputs.m_axisX.GetValue());
 		bool bCrouched = IsCrouched();
 		bool bCanMove = (bCrouched && CanMoveCrouched()) || GetState() == State.Standard;
 
 		// compute horizontal velocity from input
-		float fMoveDir = m_inputs.m_axisX.GetValue() != 0f ? Mathf.Sign(m_inputs.m_axisX.GetValue()) : (m_motor.FaceRight ? 1f : -1f);
+		// float fMoveDir = m_inputs.m_axisX.GetValue() != 0f ? Mathf.Sign(m_inputs.m_axisX.GetValue()) : (m_motor.FaceRight ? 1f : -1f);
+    	float fMoveDir = inputAxisX != 0f ? Mathf.Sign(inputAxisX) : (m_motor.FaceRight ? 1f : -1f);
 
 		// compute slope factor
 		m_speedFactor = 1f;
@@ -1237,86 +1266,45 @@ public partial class APCharacterController : MonoBehaviour
 		if (m_onGround)
 		{
 			float fGroundAngle = Mathf.Rad2Deg * Mathf.Acos(m_motor.GetGroundNormal().y);
-            m_fGroundAngleSigned = fMoveDir != Mathf.Sign(m_motor.GetGroundNormal().x) ? fGroundAngle : -fGroundAngle;
+			m_fGroundAngleSigned = fMoveDir != Mathf.Sign(m_motor.GetGroundNormal().x) ? fGroundAngle : -fGroundAngle;
 
-			// handle auto down slide here
 			if (m_downSlopeSliding.m_enabled && bCanMove && (absAxisX == 0f) && (fGroundAngle >= m_downSlopeSliding.m_slopeMinAngle))
 			{
-				// - force player to slide down
 				fMoveDir = Mathf.Sign(m_motor.GetGroundNormal().x);
 				absAxisX = m_downSlopeSliding.m_slidingPower;
-				m_sliding = true; // this like a slide according to animation !
+				m_sliding = true;
 				downSlide = true;
 
-				// stop any invalid velocity
 				m_motor.m_velocity.x = fMoveDir > 0f ? Mathf.Max(0, m_motor.m_velocity.x) : Mathf.Min(0, m_motor.m_velocity.x);
 			}
 			else
-			{				
-                m_speedFactor = Mathf.Clamp01(m_basic.m_slopeSpeedMultiplier.Evaluate(m_fGroundAngleSigned));
+			{
+				m_speedFactor = Mathf.Clamp01(m_basic.m_slopeSpeedMultiplier.Evaluate(m_fGroundAngleSigned));
 			}
 		}
 
-		// add edge slide velocity if needed
-		if (m_onGround && bCanMove && !downSlide && (m_basic.m_edgeSlideFactor > absAxisX))
-		{
-			float fPushDir = HandleEdgeSlide();
-			if(fPushDir != 0f && fPushDir == fMoveDir)
-			{
-				absAxisX = Mathf.Min(m_basic.m_edgeSlideFactor, 1f);
-				m_inputs.m_axisX.SetForcedValue(true, absAxisX * fMoveDir); // to force walking animation in this situation
-			}
-		}
-		
-		// Compute move direction
-		Vector2 hrzMoveDir = new Vector2(fMoveDir, 0f);		
+		Vector2 hrzMoveDir = new Vector2(fMoveDir, 0f);
 		float hrzMoveLength = absAxisX * maxSpeed * m_speedFactor;
 
-		// align this velocity on ground plane if we touch the ground 		
-		bool bAttacking = IsAttackingStopped();
-		if (m_onGround)
-		{
-			float fDot = Vector2.Dot(hrzMoveDir, m_motor.GetGroundNormal());
-			if (Mathf.Abs(fDot) > float.Epsilon)
-			{
-				Vector3 perpAxis = Vector3.Cross(hrzMoveDir, m_motor.GetGroundNormal());
-				hrzMoveDir = Vector3.Cross(m_motor.GetGroundNormal(), perpAxis);
-				hrzMoveDir.Normalize();
-			}
-
-			// cancel input if needed
-			if (!downSlide && (bCrouched && !CanMoveCrouched() || bAttacking))
-			{
-				hrzMoveLength = 0f;
-			}
-		}
-		else if(m_groundAlign.m_alignAirMove)
-		{
-			hrzMoveDir = transform.TransformDirection(hrzMoveDir);
-		}
-
-		// handle dynamic
 		if (m_onGround)
 		{
 			float fDynFriction, fStaticFriction;
 			ComputeFrictions(out fDynFriction, out fStaticFriction);
 
-			// update sliding status
-			bool bDynSliding = !(bCrouched && !CanMoveCrouched()) && !bAttacking && absAxisX > 0f;
+			bool bDynSliding = !(bCrouched && !CanMoveCrouched()) && absAxisX > 0f;
 			if ((bDynSliding && fDynFriction < 1f) || (!bDynSliding && fStaticFriction < 1f))
 			{
 				m_sliding = true;
-			} 
+			}
 
 			float fVelOnMove = Vector2.Dot(m_motor.m_velocity, hrzMoveDir);
 			float fDirLength = fVelOnMove;
-			if(m_sliding && !downSlide)
+			if (m_sliding && !downSlide)
 			{
-				// dynamic is different while sliding
-				if(bDynSliding)
+				if (bDynSliding)
 				{
 					float fDiffMax = maxSpeed - fVelOnMove;
-					if(fDiffMax > 0f)
+					if (fDiffMax > 0f)
 					{
 						fDirLength = fVelOnMove + Mathf.Min(fDiffMax, absAxisX * fDynFriction * Time.deltaTime * 20f);
 					}
@@ -1328,35 +1316,23 @@ public partial class APCharacterController : MonoBehaviour
 			}
 			else
 			{
-				// raise deceleration for crouched/attack
-				float fDecel = (!downSlide && (bCrouched || bAttacking)) ? m_basic.m_deceleration * 2f : m_basic.m_deceleration;
+				float fDecel = (!downSlide && (bCrouched || IsAttackingStopped())) ? m_basic.m_deceleration * 2f : m_basic.m_deceleration;
 				fDirLength = APInputJoystick.Update(fVelOnMove, hrzMoveLength, m_basic.m_stopOnRotate, m_basic.m_acceleration, fDecel, Time.deltaTime);
-			}
-
-			// handle case where uncrouch speed is requested
-			if(m_needUncrouch && Mathf.Abs(fDirLength) < m_basic.m_uncrouchMinSpeed)
-			{
-				fDirLength = m_basic.m_uncrouchMinSpeed;
-				m_needUncrouch = false;
 			}
 
 			ClampValueWithDamping(ref fDirLength, m_advanced.m_maxVelDamping, -maxSpeed, maxSpeed);
 			m_motor.m_velocity = hrzMoveDir * (fDirLength);
 
-			// update ground speed
 			m_groundSpeed = m_motor.m_velocity.magnitude;
 		}
 		else
 		{
-			// in air dynamic
 			float fVelOnMove = Vector2.Dot(m_motor.m_velocity, hrzMoveDir);
 			float fDiffVel = (hrzMoveLength - fVelOnMove);
 			float fMaxAccel = m_basic.m_airPower * Time.deltaTime * (GetState() == State.Glide ? m_glide.m_lateralMoveFactor : 1f);
 			fDiffVel = Mathf.Clamp(fDiffVel, -fMaxAccel, fMaxAccel);
 
 			m_motor.m_velocity += hrzMoveDir * fDiffVel;
-
-			// TODO : fix clamping when in air ground align is enabled
 			ClampValueWithDamping(ref m_motor.m_velocity.x, m_advanced.m_maxAirVelDamping, -m_basic.m_maxAirSpeed, m_basic.m_maxAirSpeed);
 			ClampValueWithDamping(ref m_motor.m_velocity.y, m_advanced.m_maxAirVelDamping, -m_basic.m_maxFallSpeed, float.MaxValue);
 			m_groundSpeed = 0f;
