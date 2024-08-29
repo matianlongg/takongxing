@@ -5,6 +5,7 @@
 [Bb]uilds/
 [Ll]ogs/
 [Mm]emoryCaptures/
+wx_build/
 *.csproj
 *.unityproj
 *.sln
@@ -21,3 +22,4 @@
 .idea/
 .vscode/
 .DS_Store
+

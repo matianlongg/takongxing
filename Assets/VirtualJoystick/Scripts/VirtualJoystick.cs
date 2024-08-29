@@ -65,7 +65,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                Debug.LogWarning("No instances of joysticks found on the Scene.");
+                // Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return 0;
             }
 
@@ -87,7 +87,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                Debug.LogWarning("No instances of joysticks found on the Scene.");
+                // Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return Vector2.zero;
             }
 
@@ -99,7 +99,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                Debug.LogWarning("No instances of joysticks found on the Scene.");
+                // Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return Vector2.zero;
             }
             
@@ -124,7 +124,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                Debug.LogWarning("No instances of joysticks found on the Scene.");
+                // Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return 0;
             }
 
@@ -135,7 +135,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                Debug.LogWarning("No instances of joysticks found on the Scene.");
+                // Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return Vector2.zero;
             }
 
@@ -342,6 +342,15 @@ namespace Terresquall {
             axis = (controlStick.transform.position - transform.position) / GetRadius();
             if(axis.magnitude < deadzone)
                 axis = Vector2.zero;
+
+
+            // 限制最大最小
+            float minLimit = -1.0f; // Set your minimum limit here
+            float maxLimit = 1.0f;  // Set your maximum limit here
+
+            axis.x = Mathf.Clamp(axis.x, minLimit, maxLimit);
+            axis.y = Mathf.Clamp(axis.y, minLimit, maxLimit);
+
 
             // If a joystick is toggled and we are debugging, output to console.
             if(axis.sqrMagnitude > 0) {
