@@ -20,18 +20,21 @@ namespace Terresquall {
         [Header("Events")]
         public Action OnButtonPressed; // 按钮按下时触发的事件
         public Action OnButtonReleased; // 按钮松开时触发的事件
+        public Action OnButtonHeld; // 按钮按住时持续触发的事件
+
+        // private bool isHeld = false; // 按钮是否被按住的状态
+
+        public bool isHeld { get; private set; }
 
         internal Color originalColor; // 存储按钮的原始颜色
         Canvas canvas;
 
         void OnEnable() {
-            // 如果只在移动设备上运行且当前不是移动设备，则禁用按钮
             if (!Application.isMobilePlatform && onlyOnMobile) {
                 gameObject.SetActive(false);
                 return;
             }
 
-            // 获取按钮所在的Canvas
             canvas = GetComponentInParent<Canvas>();
             if (!canvas) {
                 Debug.LogError(
@@ -44,21 +47,31 @@ namespace Terresquall {
             originalColor = controlStick.color; // 存储按钮的原始颜色
         }
 
-        // 按下按钮时的处理
+        // public bool IsHeld
+        // {
+        //     get { return isHeld; }
+        // }
+
         public void OnPointerDown(PointerEventData data) {
             controlStick.color = pressedColor; // 改变颜色以指示按钮已被按下
+            isHeld = true; // 设置为按住状态
             OnButtonPressed?.Invoke(); // 触发按下事件
         }
 
-        // 松开按钮时的处理
         public void OnPointerUp(PointerEventData data) {
             controlStick.color = originalColor; // 恢复原始颜色
+            isHeld = false; // 取消按住状态
             OnButtonReleased?.Invoke(); // 触发松开事件
+        }
+
+        void Update() {
+            if (isHeld) {
+                OnButtonHeld?.Invoke(); // 持续触发按住事件
+            }
         }
 
         void Reset() {
             for (int i = 0; i < transform.childCount; i++) {
-                // 找到合适的Image组件
                 Image img = transform.GetChild(i).GetComponent<Image>();
                 if (img) {
                     controlStick = img;

@@ -210,6 +210,11 @@ public partial class APCharacterController : MonoBehaviour
 	private VirtualJoystick virtualJoystick;
 	public VirtualButton jumpButton;
 
+	public VirtualButton AttackButton;
+
+	public VirtualButton GlideButton;
+
+
 	// Use this for initialization
 	void Awake()
 	{
@@ -242,7 +247,7 @@ public partial class APCharacterController : MonoBehaviour
 		}
 
 		// 通过查找或直接在 Inspector 中设置引用
-		jumpButton = FindObjectOfType<VirtualButton>();
+		// jumpButton = FindObjectOfType<VirtualButton>();
 
 		if (jumpButton != null)
 		{
@@ -252,6 +257,32 @@ public partial class APCharacterController : MonoBehaviour
 		{
 			Debug.LogError("VirtualButton instance not found. Please ensure it exists in the scene.");
 		}
+
+		// AttackButton = FindObjectOfType<VirtualButton>();
+
+		if (AttackButton != null)
+		{
+			AttackButton.OnButtonPressed += HandleAttackButtonPress;
+		}
+		else
+		{
+			Debug.LogError("VirtualButton instance not found. Please ensure it exists in the scene.");
+		}
+
+		if (GlideButton != null)
+		{
+			// GlideButton.OnButtonPressed += HandleGlideButtonPress;
+			m_glide.m_button.m_virtualButton = GlideButton;
+			GlideButton.OnButtonPressed += () => m_glide.m_button.Refresh(true);
+    		GlideButton.OnButtonReleased += () => m_glide.m_button.Refresh(false);
+
+		}
+		else
+		{
+			Debug.LogError("GlideButton instance not found. Please ensure it exists in the scene.");
+		}
+
+		
 	}
 
 	void OnDisable()
@@ -260,6 +291,16 @@ public partial class APCharacterController : MonoBehaviour
 		if (jumpButton != null)
 		{
 			jumpButton.OnButtonPressed -= HandleJumpButtonPress;
+		}
+		
+		if (AttackButton != null)
+		{
+			AttackButton.OnButtonPressed -= HandleAttackButtonPress;
+		}
+
+		if (GlideButton != null)
+		{
+			GlideButton.OnButtonPressed -= HandleGlideButtonPress;
 		}
 		
         m_rigidBody.velocity = Vector2.zero;
@@ -350,7 +391,7 @@ public partial class APCharacterController : MonoBehaviour
 	}
 	// Update is called once per frame
 	void Update()
-	{
+	{	
 		m_inputs.m_axisX.SetForcedValue(true, VirtualJoystick.GetAxis("Horizontal"));
 		m_inputs.m_axisY.SetForcedValue(true, VirtualJoystick.GetAxis("Vertical"));
 		if (APSettings.m_fixedUpdate)
@@ -519,6 +560,7 @@ public partial class APCharacterController : MonoBehaviour
 		{
 		case APFsmStateEvent.eEnter:
 		{
+			Debug.Log("Entering Glide State");
 			m_glideCount++;
 			m_animAirTime = m_animations.m_minAirTime;
 			PlayAnim(m_animations.m_glide, 0f);
@@ -529,6 +571,7 @@ public partial class APCharacterController : MonoBehaviour
 
 		case APFsmStateEvent.eUpdate:
 		{
+			Debug.Log("Glide State Updating");
 			if(m_fsm.GetFsmStateTime() >= m_glide.m_maxDuration || !m_glide.m_button.GetButton() || m_onGround)
 			{
 				SetState(State.Standard);
@@ -1591,9 +1634,17 @@ public partial class APCharacterController : MonoBehaviour
 		if(m_glide.m_enabled && !IsNewStateRequested() && !m_onGround)
 		{
 			// additional glides must release input
+			// bool bGlideInput = m_glideCount == 0 ? m_glide.m_button.GetButton() : m_glide.m_button.GetButtonDown();
+			// if(bGlideInput && (m_glideCount < m_glide.m_maxCount) && (m_airTime >= m_glide.m_minAirTimeBeforeGlide))
+			// {
+			// 	Debug.Log("键盘触发滑翔·········································");
+			// 	SetState(State.Glide);
+			// }
+
 			bool bGlideInput = m_glideCount == 0 ? m_glide.m_button.GetButton() : m_glide.m_button.GetButtonDown();
 			if(bGlideInput && (m_glideCount < m_glide.m_maxCount) && (m_airTime >= m_glide.m_minAirTimeBeforeGlide))
 			{
+				Debug.Log("触发滑翔");
 				SetState(State.Glide);
 			}
 		}
@@ -2468,4 +2519,30 @@ public partial class APCharacterController : MonoBehaviour
 			}
 		}
     }
+
+	public void HandleAttackButtonPress()
+    {
+		//TODO 实现攻击
+		if ((IsCrouched() || GetState() == State.Standard) && !IsNewStateRequested())
+		{
+			// Trigger the attack using the first attack available in the list (for simplicity)
+			if (m_attacks.m_enabled && m_attacks.m_attacks.Length > 0)
+			{
+				LaunchAttack(m_attacks.m_attacks[0]); // Launch the first attack in the list
+			}
+		}
+    }
+
+
+	public void HandleGlideButtonPress()
+	{
+		// 判断当前是否可以执行滑翔
+		Debug.Log("Glide button pressed");
+		Debug.Log("按钮触发滑翔·········································");
+		if (!IsNewStateRequested() && !m_onGround && m_glide.m_enabled && m_glideCount < m_glide.m_maxCount)
+		{
+
+			SetState(State.Glide);
+		}
+	}
 }

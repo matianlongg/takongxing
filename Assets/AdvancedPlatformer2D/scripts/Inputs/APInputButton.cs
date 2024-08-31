@@ -1,5 +1,5 @@
 /* Copyright (c) 2014 Advanced Platformer 2D */
-
+using Terresquall;
 using UnityEngine;
 
 [System.Serializable]
@@ -12,6 +12,9 @@ public class APInputButton
     public string[] m_holders;					// additional buttons we must hold while testing button as pushed
     public string[] m_releasers;				// additional buttons we must release while testing button as pushed
     public APInputConstrainedAxis[] m_axis;		// additional axis constraints
+
+	public VirtualButton m_virtualButton;
+
 
 	////////////////////////////////////////////////////////
 	// PRIVATE/LOW LEVEL
@@ -75,12 +78,19 @@ public class APInputButton
 	// check button current state
 	public bool GetButton()
 	{
-        bool bRet = string.IsNullOrEmpty(m_name) ? false : Input.GetButton(m_name) && Holders() && Releasers() && AllAxisConstraintsValid();
-		if(m_plugin != null)
-		{
-			bRet |= m_plugin.GetButton();
-		}
-		return bRet;
+		bool bRet = (m_virtualButton != null && m_virtualButton.isHeld) 
+                    || (!string.IsNullOrEmpty(m_name) && Input.GetButton(m_name) && Holders() && Releasers() && AllAxisConstraintsValid());
+        if (m_plugin != null)
+        {
+            bRet |= m_plugin.GetButton();
+        }
+        return bRet;
+        // bool bRet = string.IsNullOrEmpty(m_name) ? false : Input.GetButton(m_name) && Holders() && Releasers() && AllAxisConstraintsValid();
+		// if(m_plugin != null)
+		// {
+		// 	bRet |= m_plugin.GetButton();
+		// }
+		// return bRet;
 	}
 
 	// check if button has been pressed down at last frame
@@ -123,22 +133,36 @@ public class APInputButton
 
 	bool InternalGetButtonDown()
 	{
-        bool bRet = string.IsNullOrEmpty(m_name) ? false : Input.GetButtonDown(m_name) && Holders() && Releasers() && AllAxisConstraintsValid();
-		if(m_plugin != null)
-		{
-			bRet |= m_plugin.GetButtonDown();
-		}
-		return bRet;
+        // bool bRet = string.IsNullOrEmpty(m_name) ? false : Input.GetButtonDown(m_name) && Holders() && Releasers() && AllAxisConstraintsValid();
+		// if(m_plugin != null)
+		// {
+		// 	bRet |= m_plugin.GetButtonDown();
+		// }
+		// return bRet;
+
+		bool bRet = string.IsNullOrEmpty(m_name) ? false : Input.GetButtonDown(m_name) && Holders() && Releasers() && AllAxisConstraintsValid();
+        if(m_plugin != null)
+        {
+            bRet |= m_plugin.GetButtonDown();
+        }
+        return bRet || (m_virtualButton != null && m_virtualButton.isHeld && !m_bDown);
 	}
 
 	bool InternalGetButtonUp()
 	{
+		// bool bRet = string.IsNullOrEmpty(m_name) ? false : Input.GetButtonUp(m_name);
+		// if(m_plugin != null)
+		// {
+		// 	bRet |= m_plugin.GetButtonUp();
+		// }
+		// return bRet;
+
 		bool bRet = string.IsNullOrEmpty(m_name) ? false : Input.GetButtonUp(m_name);
-		if(m_plugin != null)
-		{
-			bRet |= m_plugin.GetButtonUp();
-		}
-		return bRet;
+        if(m_plugin != null)
+        {
+            bRet |= m_plugin.GetButtonUp();
+        }
+        return bRet || (m_virtualButton != null && !m_virtualButton.isHeld && m_bDown);
 	}
 }
 
