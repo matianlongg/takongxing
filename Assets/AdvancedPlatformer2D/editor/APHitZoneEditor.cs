@@ -19,9 +19,7 @@ public class APHitZoneEditor : Editor
 			Color color = Color.green;
 			color.a = 0.5f;
 			Handles.color = color;
-			// Vector3 newPos = Handles.FreeMoveHandle(pointPos, Quaternion.identity, oHitZone.m_radius * 2f, Vector3.zero, Handles.SphereCap);
 			Vector3 newPos = Handles.FreeMoveHandle(pointPos, oHitZone.m_radius * 2f, Vector3.zero, Handles.SphereHandleCap);
-
 			if (newPos != pointPos)
 			{
 				Undo.RecordObject(oHitZone.transform, "Move Hit Zone");

@@ -40,7 +40,7 @@ public class APCharacterMotorEditor : Editor
 		}
 	}
 
-	void DrawRays (APCharacterMotor oMotor, APCharacterMotor.CharacterRay2D[] rays, Color color, direction direction)
+	void DrawRays (APCharacterMotor oMotor, APCharacterMotor.CharacterRay2D[] rays, Color color, direction direction) 
 	{
 		Transform rayTransform = oMotor.transform;
 
@@ -49,7 +49,6 @@ public class APCharacterMotorEditor : Editor
 			APCharacterMotor.CharacterRay2D curRay = rays[i];
 			Vector3 pointPos = oMotor.GetRayPositionWs(curRay);
 			Handles.color = color;
-			// Vector3 newPos = Handles.FreeMoveHandle(pointPos, Quaternion.identity, 0.03f, Vector3.zero, Handles.DotCap);
 			Vector3 newPos = Handles.FreeMoveHandle(pointPos, 0.03f, Vector3.zero, Handles.DotHandleCap);
 
 			if(newPos != pointPos)
@@ -74,7 +73,6 @@ public class APCharacterMotorEditor : Editor
 
 			float fPen = curRay.m_penetration * Mathf.Abs(fPenScale);
 			Handles.DrawLine(pointPos, pointPos + (Vector3)rayDir * (fPen + curRay.m_extraDistance));
-			// Handles.CircleCap(0, pointPos + (Vector3)rayDir * fPen, Quaternion.identity, 0.03f);
 			Handles.CircleHandleCap(0, pointPos + (Vector3)rayDir * fPen, Quaternion.identity, 0.03f, EventType.Repaint);
 
 		}

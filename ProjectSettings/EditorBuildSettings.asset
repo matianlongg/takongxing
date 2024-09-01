@@ -11,4 +11,13 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/AdvancedPlatformer2D/scenes/Basics.unity
     guid: bd011d0a6b720f443bf453a218db4709
+  - enabled: 1
+    path: Assets/AdvancedPlatformer2D/scenes/Falling World.unity
+    guid: b545f22c9502c1f4d9dc3da793cb04e8
+  - enabled: 1
+    path: Assets/AdvancedPlatformer2D/scenes/Menu.unity
+    guid: 1027723fb3ec5e245befa308a9fc19a4
+  - enabled: 1
+    path: Assets/AdvancedPlatformer2D/scenes/Ranged Attack.unity
+    guid: 8dae2ca443de38644afa23be8e090cfd
   m_configObjects: {}

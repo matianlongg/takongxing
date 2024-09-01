@@ -51,9 +51,7 @@ public class APJumperEditor : Editor
 
 			//Vector3 dir = new Vector3(-oJumper.m_impulseDirection, 90f, 0f);
 			Quaternion rot = Quaternion.LookRotation(v2ImpulseDir);
-			// Handles.ArrowCap(0, oJumper.transform.position, rot, 0.5f);
 			Handles.ArrowHandleCap(0, oJumper.transform.position, rot, 0.5f, EventType.Repaint);
-
 		}
 	}
 }

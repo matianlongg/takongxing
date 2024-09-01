@@ -30,8 +30,6 @@ public class APEdgeGrabEditor : Editor
 		Handles.color = color;
 		Vector3 newPos = Handles.FreeMoveHandle(pointPos, radius * 2f, Vector3.zero, Handles.SphereHandleCap);
 
-
-
 		if (newPos != pointPos)
 		{
 			Undo.RecordObject(oGrab, "Move grab handle");

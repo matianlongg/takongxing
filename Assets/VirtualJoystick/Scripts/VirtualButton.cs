@@ -14,7 +14,7 @@ namespace Terresquall {
         public Image controlStick; // 按钮的图片引用
 
         [Header("Settings")]
-        public bool onlyOnMobile = true;
+        public bool onlyOnMobile = false;
         public Color pressedColor = new Color(0.9f, 0.9f, 0.9f, 1f); // 按钮被按下时的颜色
 
         [Header("Events")]

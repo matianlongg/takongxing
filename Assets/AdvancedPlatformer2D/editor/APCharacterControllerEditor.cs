@@ -64,7 +64,6 @@ public class APCharacterControllerEditor : Editor
 						Color color = Color.green;
 						color.a = 0.5f;
 						Handles.color = color;
-						// Vector3 newPos = Handles.FreeMoveHandle(pointPos, Quaternion.identity, curZone.m_radius * 2f, Vector3.zero, Handles.SphereCap);
 						Vector3 newPos = Handles.FreeMoveHandle(pointPos, curZone.m_radius * 2f, Vector3.zero, Handles.SphereHandleCap);
 
 						if (newPos != pointPos)
@@ -103,7 +102,6 @@ public class APCharacterControllerEditor : Editor
 			Color color = Color.cyan;
 			color.a = 0.5f;
 			Handles.color = color;
-			// Vector3 newPos = Handles.FreeMoveHandle(pointPos, Quaternion.identity, 0.1f, Vector3.zero, Handles.SphereCap);
 			Vector3 newPos = Handles.FreeMoveHandle(pointPos, 0.1f, Vector3.zero, Handles.SphereHandleCap);
 
 			if (GUI.changed)
@@ -128,7 +126,6 @@ public class APCharacterControllerEditor : Editor
 			v2MoveDir = oController.transform.TransformDirection(v2MoveDir);
 
 			Quaternion rot = Quaternion.LookRotation(v2MoveDir);
-			// Handles.ArrowCap(0, pointPos, rot, 0.5f);
 			Handles.ArrowHandleCap(0, pointPos, rot, 0.5f, EventType.Repaint);
 
 		}

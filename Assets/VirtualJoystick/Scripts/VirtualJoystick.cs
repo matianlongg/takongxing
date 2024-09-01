@@ -51,11 +51,6 @@ namespace Terresquall {
         Vector2Int lastScreen;
         Canvas canvas;
 
-        private bool isJoystickVisible = true;
-
-        public Canvas targetCanvas; // 指定检测触摸的 Canvas
-
-
         // Gets us the number of active joysticks on the screen.
         public static int CountActiveInstances() {
             int count = 0;
@@ -70,7 +65,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                // Debug.LogWarning("No instances of joysticks found on the Scene.");
+                Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return 0;
             }
 
@@ -92,7 +87,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                // Debug.LogWarning("No instances of joysticks found on the Scene.");
+                Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return Vector2.zero;
             }
 
@@ -104,7 +99,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                // Debug.LogWarning("No instances of joysticks found on the Scene.");
+                Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return Vector2.zero;
             }
             
@@ -129,7 +124,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                // Debug.LogWarning("No instances of joysticks found on the Scene.");
+                Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return 0;
             }
 
@@ -140,7 +135,7 @@ namespace Terresquall {
             // Show an error if no joysticks are found.
             if (instances.Count <= 0)
             {
-                // Debug.LogWarning("No instances of joysticks found on the Scene.");
+                Debug.LogWarning("No instances of joysticks found on the Scene.");
                 return Vector2.zero;
             }
 
@@ -160,9 +155,6 @@ namespace Terresquall {
             currentPointerId = data.pointerId;
             SetPosition(data.position);
             controlStick.color = dragColor;
-
-            // 显示摇杆
-            ShowJoystick();
         }
 
         // What happens when we stop pressing down on the element.
@@ -176,8 +168,6 @@ namespace Terresquall {
                 transform.position = origin;
                 SetPosition(origin);
             }*/
-            // 隐藏摇杆
-            HideJoystick();
         }
 
         protected void SetPosition(Vector2 position) {
@@ -299,8 +289,6 @@ namespace Terresquall {
 
             // Add this instance to the List.
             instances.Insert(0,this);
-
-            HideJoystick(); // 初始时隐藏摇杆
         }
 
         // Added in Version 1.0.2.
@@ -316,52 +304,9 @@ namespace Terresquall {
             instances.Remove(this);
         }
 
-        private void ShowJoystickAtPosition(Vector2 position, int pointerId) {
-            transform.position = position;
-            ShowJoystick();
-
-            // 模拟 OnPointerDown 事件
-            PointerEventData data = new PointerEventData(EventSystem.current);
-            data.position = position;
-            data.pointerId = pointerId;
-            OnPointerDown(data);
-        }
-
-        private bool IsPointerInCanvas(Vector2 screenPosition) {
-            if (targetCanvas == null) return false;
-
-            RectTransform canvasRect = targetCanvas.GetComponent<RectTransform>();
-            Vector2 localPoint;
-
-            // 将屏幕位置转换为 Canvas 内部的位置
-            RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPosition, targetCanvas.worldCamera, out localPoint);
-
-            // 检查该位置是否在 Canvas 的边界内
-            return canvasRect.rect.Contains(localPoint);
-        }
-
-
         void Update() {
             PositionUpdate();
             
-            // 检测触摸或鼠标点击
-            if (Input.touchCount > 0) {
-                Touch touch = Input.GetTouch(0);
-                if (touch.phase == TouchPhase.Began && IsPointerInCanvas(touch.position)) {
-                    ShowJoystickAtPosition(touch.position, touch.fingerId);
-                }
-            } else if (Input.GetMouseButtonDown(0) && IsPointerInCanvas(Input.mousePosition)) {
-                ShowJoystickAtPosition(Input.mousePosition, -1);
-            }
-            // if (Input.touchCount > 0) {
-            //     Touch touch = Input.GetTouch(0);
-            //     if (touch.phase == TouchPhase.Began) {
-            //         ShowJoystickAtPosition(touch.position, touch.fingerId);
-            //     }
-            // } else if (Input.GetMouseButtonDown(0)) {
-            //     ShowJoystickAtPosition(Input.mousePosition, -1);
-            // }
-
             // If the screen has changed, reset the joystick.
             if(lastScreen.x != Screen.width || lastScreen.y != Screen.height) {
                 lastScreen = new Vector2Int(Screen.width,Screen.height);
@@ -397,15 +342,6 @@ namespace Terresquall {
             axis = (controlStick.transform.position - transform.position) / GetRadius();
             if(axis.magnitude < deadzone)
                 axis = Vector2.zero;
-
-
-            // 限制最大最小
-            float minLimit = -1.0f; // Set your minimum limit here
-            float maxLimit = 1.0f;  // Set your maximum limit here
-
-            axis.x = Mathf.Clamp(axis.x, minLimit, maxLimit);
-            axis.y = Mathf.Clamp(axis.y, minLimit, maxLimit);
-
 
             // If a joystick is toggled and we are debugging, output to console.
             if(axis.sqrMagnitude > 0) {
@@ -513,22 +449,6 @@ namespace Terresquall {
             data.position = newPos;
             data.pointerId = newPointerId;
             OnPointerDown(data);
-        }
-
-        private void ShowJoystick() {
-            if (!isJoystickVisible) {
-                GetComponent<Image>().enabled = true; // 显示大白圈
-                controlStick.gameObject.SetActive(true); // 显示摇杆
-                isJoystickVisible = true;
-            }
-        }
-
-        private void HideJoystick() {
-            if (isJoystickVisible) {
-                GetComponent<Image>().enabled = false; // 隐藏大白圈
-                controlStick.gameObject.SetActive(false); // 隐藏摇杆
-                isJoystickVisible = false;
-            }
         }
     }
 }
