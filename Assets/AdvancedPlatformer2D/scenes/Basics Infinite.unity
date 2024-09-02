@@ -3682,7 +3682,11 @@ PrefabInstance:
       objectReference: {fileID: 825748041}
     - target: {fileID: 11400000, guid: 92c29451d5215fb45bdf4efd21534bbd, type: 3}
       propertyPath: m_maxPos.x
-      value: 270.899994
+      value: 270.9
+      objectReference: {fileID: 0}
+    - target: {fileID: 11400000, guid: 92c29451d5215fb45bdf4efd21534bbd, type: 3}
+      propertyPath: m_clampEnabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 92c29451d5215fb45bdf4efd21534bbd, type: 3}
       propertyPath: m_parallaxScrollings.Array.size
@@ -3694,23 +3698,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 92c29451d5215fb45bdf4efd21534bbd, type: 3}
       propertyPath: m_parallaxScrollings.Array.data[1].m_Ratio
-      value: .600000024
+      value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 92c29451d5215fb45bdf4efd21534bbd, type: 3}
       propertyPath: m_parallaxScrollings.Array.data[2].m_Ratio
-      value: .699999988
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 92c29451d5215fb45bdf4efd21534bbd, type: 3}
       propertyPath: m_parallaxScrollings.Array.data[3].m_Ratio
-      value: .800000012
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 92c29451d5215fb45bdf4efd21534bbd, type: 3}
       propertyPath: m_parallaxScrollings.Array.data[4].m_Ratio
-      value: .899999976
+      value: 0.9
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 92c29451d5215fb45bdf4efd21534bbd, type: 3}
       propertyPath: m_parallaxScrollings.Array.data[5].m_Ratio
-      value: .949999988
+      value: 0.95
       objectReference: {fileID: 0}
     - target: {fileID: 11400000, guid: 92c29451d5215fb45bdf4efd21534bbd, type: 3}
       propertyPath: m_parallaxScrollings.Array.data[0].m_Target
@@ -4348,8 +4352,8 @@ MonoBehaviour:
   - {fileID: 300677276053367232, guid: b838df2650c99b44faee2855b4dc7a85, type: 3}
   numberOfSegments: 2
   segmentLength: 58
-  maxSavedSegments: 10
-  preGenerateDistance: 20
+  maxSavedSegments: 3
+  preGenerateDistance: 40
 --- !u!4 &1717702628
 Transform:
   m_ObjectHideFlags: 0
@@ -5210,7 +5214,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6948263104294772900, guid: 4977fd2f9c215ef49b870d5c45fb72ac, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
