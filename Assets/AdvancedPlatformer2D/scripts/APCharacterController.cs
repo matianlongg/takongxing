@@ -356,8 +356,17 @@ public partial class APCharacterController : MonoBehaviour
 	{
 		if (APSettings.m_fixedUpdate)
 		{
-			m_inputs.m_axisX.SetForcedValue(true, VirtualJoystick.GetAxis("Horizontal"));
-			m_inputs.m_axisY.SetForcedValue(true, VirtualJoystick.GetAxis("Vertical"));
+			// Debug.Log(VirtualJoystick.GetAxis("Horizontal"));
+			// Debug.Log(VirtualJoystick.GetAxis("Vertical"));
+			// m_inputs.m_axisX.SetForcedValue(true, VirtualJoystick.GetAxis("Horizontal"));
+			// m_inputs.m_axisY.SetForcedValue(true, VirtualJoystick.GetAxis("Vertical"));
+
+			float horizontalInput = VirtualJoystick.GetAxis("Horizontal");
+			float verticalInput = VirtualJoystick.GetAxis("Vertical");
+
+			m_inputs.m_axisX.SetForcedValue(true, horizontalInput > 0 ? 1 : (horizontalInput < 0 ? -1 : 0));
+			m_inputs.m_axisY.SetForcedValue(true, verticalInput > 0 ? 1 : (verticalInput < 0 ? -1 : 0));
+
 
 			UpdateController();
 			RefreshInputs(false);
