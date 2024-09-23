@@ -9,7 +9,7 @@ namespace Terresquall {
 
     [System.Serializable]
     [RequireComponent(typeof(Image),typeof(RectTransform))]
-    public class VirtualJoystick:MonoBehaviour {
+    public class VirtualJoystick:MonoBehaviour, IDragHandler {
 
         public Image controlStick;
 
@@ -449,6 +449,12 @@ namespace Terresquall {
             data.position = newPos;
             data.pointerId = newPointerId;
             OnPointerDown(data);
+        }
+
+        public void OnDrag(PointerEventData eventData)
+        {
+            SetPosition(eventData.position);  // 更新摇杆位置
+        
         }
     }
 }

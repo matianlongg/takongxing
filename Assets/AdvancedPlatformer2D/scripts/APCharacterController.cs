@@ -375,9 +375,11 @@ public partial class APCharacterController : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		m_inputs.m_axisX.SetForcedValue(true, VirtualJoystick.GetAxis("Horizontal"));
-		m_inputs.m_axisY.SetForcedValue(true, VirtualJoystick.GetAxis("Vertical"));
-		
+		if (virtualJoystick != null) 
+		{
+			m_inputs.m_axisX.SetForcedValue(true, VirtualJoystick.GetAxis("Horizontal"));
+			m_inputs.m_axisY.SetForcedValue(true, VirtualJoystick.GetAxis("Vertical"));
+		}
 		if (APSettings.m_fixedUpdate)
 		{
 			RefreshInputs(true);
@@ -1058,10 +1060,14 @@ public partial class APCharacterController : MonoBehaviour
 		m_inputs.m_axisX.Update(Time.deltaTime);
 		m_inputs.m_axisY.Update(Time.deltaTime);
 
-		if (VirtualJoystick.GetAxis("Horizontal") != 0 || VirtualJoystick.GetAxis("Vertical") != 0)
+		if (virtualJoystick != null) 
 		{
-			// 使用摇杆的输入值，避免被覆盖
-			return;
+			if (VirtualJoystick.GetAxis("Horizontal") != 0 || VirtualJoystick.GetAxis("Vertical") != 0)
+			{
+				// 使用摇杆的输入值，避免被覆盖
+				return;
+			}
+
 		}
 
 		// handle auto move here

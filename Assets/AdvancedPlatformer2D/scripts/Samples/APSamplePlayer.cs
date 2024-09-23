@@ -20,6 +20,7 @@ public class APSamplePlayer : MonoBehaviour
 	public Vector2 m_hitImpulse = new Vector2(8f, 12f);		// impulse when beeing hit by Blob
 	public float m_waitTimeAfterDie = 0f;					// time to wait before reseting level after dying (to allows die animation to play)
 	public string m_animDie;								// state of animation die
+	public GameObject gameOverPanel;                       // Reference to the Game Over UI Panel
 
 	////////////////////////////////////////////////////////
 	// PRIVATE/LOW LEVEL
@@ -55,6 +56,11 @@ public class APSamplePlayer : MonoBehaviour
 
 		// initialize GUI
 		RefreshGUI();
+
+		if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(false);
+        }
 	}
 
 	// Update is called once per frame
@@ -179,9 +185,20 @@ public class APSamplePlayer : MonoBehaviour
 			m_player.PlayAnim(m_animDie);
 		}
 
+        ShowGameOverMenu(); // 显示游戏结束菜单
+
 		// Request restart of level
-		StartCoroutine("RestartLevel");
+		// StartCoroutine("RestartLevel");
 	}
+
+	void ShowGameOverMenu()
+    {
+        // 显示游戏结束面板
+        if (gameOverPanel != null)
+        {
+            gameOverPanel.SetActive(true);
+        }
+    }
 
 	IEnumerator RestartLevel () 
 	{

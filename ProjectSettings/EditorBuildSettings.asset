@@ -5,22 +5,13 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: Assets/Scenes/SampleScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
   - enabled: 1
-    path: Assets/AdvancedPlatformer2D/scenes/Menu.unity
-    guid: 1027723fb3ec5e245befa308a9fc19a4
-  - enabled: 1
-    path: Assets/AdvancedPlatformer2D/scenes/Basics.unity
-    guid: bd011d0a6b720f443bf453a218db4709
-  - enabled: 1
-    path: Assets/AdvancedPlatformer2D/scenes/Falling World.unity
-    guid: b545f22c9502c1f4d9dc3da793cb04e8
-  - enabled: 1
-    path: Assets/AdvancedPlatformer2D/scenes/Ranged Attack.unity
-    guid: 8dae2ca443de38644afa23be8e090cfd
+    path: Assets/AdvancedPlatformer2D/scenes/Main.unity
+    guid: 82892047e9aca1249b07b4ed20c922dd
   - enabled: 1
     path: Assets/AdvancedPlatformer2D/scenes/Basics Infinite.unity
     guid: 7efdaf02a0a4a564abd655cb21be5649
+  - enabled: 1
+    path: Assets/AdvancedPlatformer2D/scenes/RankList.unity
+    guid: 76ff60f7616029e489d2cb239a7a5f48
   m_configObjects: {}
