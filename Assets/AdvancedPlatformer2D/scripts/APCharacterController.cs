@@ -209,7 +209,7 @@ public partial class APCharacterController : MonoBehaviour
 
 	// Use this for initialization
 
-	private VirtualJoystick virtualJoystick;
+	public VirtualJoystick virtualJoystick;
 	public VirtualButton JumpButton;
 
 	public VirtualButton AttackButton;

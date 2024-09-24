@@ -5913,6 +5913,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 7125754439008817797}
     - target: {fileID: 11400000, guid: bf46711586a6b1e4faf0d0717256616f, type: 3}
+      propertyPath: virtualJoystick
+      value: 
+      objectReference: {fileID: 4484707147434748373}
+    - target: {fileID: 11400000, guid: bf46711586a6b1e4faf0d0717256616f, type: 3}
       propertyPath: m_glide.m_enabled
       value: 1
       objectReference: {fileID: 0}
@@ -6665,6 +6669,17 @@ GameObject:
   m_CorrespondingSourceObject: {fileID: 103021472943788467, guid: 4977fd2f9c215ef49b870d5c45fb72ac, type: 3}
   m_PrefabInstance: {fileID: 4484707147434748370}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &4484707147434748373 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2473600702154246217, guid: 4977fd2f9c215ef49b870d5c45fb72ac, type: 3}
+  m_PrefabInstance: {fileID: 4484707147434748370}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4484707147434748371}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 23f9ac44728580c41ad91debed290eab, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &4484707147434748382
 MonoBehaviour:
   m_ObjectHideFlags: 0
