@@ -3,6 +3,7 @@
 using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
+using UnityEngine.Networking;
 
 [RequireComponent(typeof(APCharacterController))]
 [AddComponentMenu("Advanced Platformer 2D/Samples/APSamplePlayer")]
@@ -197,6 +198,41 @@ public class APSamplePlayer : MonoBehaviour
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
+			UploadScoreToCloud(); // 假设 currentScore 是当前得分的变量
+
+        }
+    }
+
+	void UploadScoreToCloud()
+	{
+		// 这里是上传得分的逻辑，可能涉及网络请求
+		// 例如使用UnityWebRequest发送HTTP请求到你的云服务
+		StartCoroutine(SubmitScoreCoroutine());
+	}
+
+	private IEnumerator SubmitScoreCoroutine()
+    {
+        // 创建 JSON 数据
+		ScoreData data = new ScoreData("checnh", 5);
+    	string jsonData = JsonUtility.ToJson(data);
+		Debug.Log(jsonData);
+
+        using (UnityWebRequest www = UnityWebRequest.PostWwwForm("http://localhost:5000/submit_score", jsonData))
+        {
+            www.SetRequestHeader("Content-Type", "application/json");
+
+            // 发送请求并等待响应
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Error submitting score: " + www.error);
+            }
+            else
+            {
+                Debug.Log("Score submitted successfully!");
+                // 在这里可以更新 UI 或其他逻辑
+            }
         }
     }
 
