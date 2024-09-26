@@ -217,23 +217,44 @@ public class APSamplePlayer : MonoBehaviour
     	string jsonData = JsonUtility.ToJson(data);
 		Debug.Log(jsonData);
 
-        using (UnityWebRequest www = UnityWebRequest.PostWwwForm("http://localhost:5000/submit_score", jsonData))
-        {
-            www.SetRequestHeader("Content-Type", "application/json");
+        // using (UnityWebRequest www = UnityWebRequest.PostWwwForm("http://localhost:5000/submit_score", jsonData))
+        // {
+        //     www.SetRequestHeader("Content-Type", "application/json");
 
-            // 发送请求并等待响应
-            yield return www.SendWebRequest();
+        //     // 发送请求并等待响应
+        //     yield return www.SendWebRequest();
 
-            if (www.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError("Error submitting score: " + www.error);
-            }
-            else
-            {
-                Debug.Log("Score submitted successfully!");
-                // 在这里可以更新 UI 或其他逻辑
-            }
-        }
+        //     if (www.result != UnityWebRequest.Result.Success)
+        //     {
+        //         Debug.LogError("Error submitting score: " + www.error);
+        //     }
+        //     else
+        //     {
+        //         Debug.Log("Score submitted successfully!");
+        //         // 在这里可以更新 UI 或其他逻辑
+        //     }
+        // }
+
+		using (UnityWebRequest www = new UnityWebRequest("http://localhost:5000/submit_score", "POST"))
+		{
+			byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+			www.uploadHandler = new UploadHandlerRaw(bodyRaw);
+			www.downloadHandler = new DownloadHandlerBuffer();
+			www.SetRequestHeader("Content-Type", "application/json");
+
+			// 发送请求并等待响应
+			yield return www.SendWebRequest();
+
+			if (www.result != UnityWebRequest.Result.Success)
+			{
+				Debug.LogError("Error submitting score: " + www.error);
+			}
+			else
+			{
+				Debug.Log("Score submitted successfully!");
+				Debug.Log("Response: " + www.downloadHandler.text);  // 输出接口返回值
+			}
+		}
     }
 
 	IEnumerator RestartLevel () 

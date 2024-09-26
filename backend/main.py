@@ -72,8 +72,18 @@ def get_scores():
     scores = cursor.fetchall()
     cursor.close()
     conn.close()
+        # 将结果转换为字典列表
+    score_list = []
+    for score in scores:
+        score_list.append({
+            'player_name': score[0],
+            'score': score[1],
+            'created_at': score[2],
+            'updated_at': score[3]
+        })
 
-    return jsonify(scores), 200
+    return jsonify(score_list), 200
+
 
 if __name__ == '__main__':
     init_db()  # 初始化数据库

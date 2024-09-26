@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 using UnityEngine.UI;
 
 public class RankItemManager : MonoBehaviour
@@ -8,7 +9,7 @@ public class RankItemManager : MonoBehaviour
     public GameObject rankItemPrefab; // 这是 RankItem 的预制件
     public Transform gridTransform;   // 这是 Grid 的 Transform
     public RectTransform contentRectTransform; // 这是 Content 的 RectTransform
-    public float itemHeight = 100f; 
+    public float itemHeight = 100f;
 
     // 方法来动态添加一个新的 RankItem
     public void AddRankItem(int rank, string name, int score)
@@ -33,7 +34,7 @@ public class RankItemManager : MonoBehaviour
     {
         // 获取 Grid Layout Group 的 Cell Size
         GridLayoutGroup gridLayoutGroup = gridTransform.GetComponent<GridLayoutGroup>();
-        
+
         // 获取当前子对象数量
         int itemCount = gridTransform.childCount;
 
@@ -57,14 +58,16 @@ public class RankItemManager : MonoBehaviour
     //     contentRectTransform.sizeDelta = new Vector2(contentRectTransform.sizeDelta.x, newHeight);
     // }
 
+
+
     void Start()
     {
-
+        StartCoroutine(GetScoresCoroutine());
         // 读取最大距离
-        float maxDistance = PlayerPrefs.GetFloat("MaxDistance", 0f);
+        // float maxDistance = PlayerPrefs.GetFloat("MaxDistance", 0f);
 
         // 添加到排行榜
-        AddRankItem(1, "Player", (int)maxDistance);
+        // AddRankItem(1, "Player2", (int)maxDistance);
 
 
         // // 假设我们要初始化一些数据
@@ -83,6 +86,53 @@ public class RankItemManager : MonoBehaviour
         //     // 添加排行榜条目
         //     AddRankItem(i, playerName, randomScore);
         // }
-        
+
+    }
+
+    private IEnumerator GetScoresCoroutine()
+    {
+        Debug.Log("get_scores");
+        using (UnityWebRequest www = UnityWebRequest.Get("http://localhost:5000/get_scores"))
+        {
+            // 发送请求并等待响应
+            yield return www.SendWebRequest();
+
+            if (www.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError("Error getting scores: " + www.error);
+            }
+            else
+            {
+                Debug.Log("Scores retrieved successfully!");
+
+                // 解析返回的 JSON 数据
+                string jsonResponse = www.downloadHandler.text;
+                Debug.Log("Response: " + jsonResponse);
+
+                var wrappedJson = WrapJsonArray(jsonResponse);
+
+
+                // 如果需要，可以将 JSON 反序列化为对象
+                // ScoreData[] scores = JsonUtility.FromJson<ScoreDataList>(jsonResponse).scores;
+                var scores = JsonUtility.FromJson<ScoreDataList>(wrappedJson);
+                for (int i = 0; i < scores.scores.Length; i++)
+                {
+                    var score = scores.scores[i];
+                    Debug.Log($"Player: {score.player_name}, Score: {score.score}, Created At: {score.created_at}, Updated At: {score.updated_at}");
+                    // 调用 AddRankItem，使用动态排名
+                    AddRankItem(i + 1, score.player_name, score.score);
+                }
+                // foreach (var score in scores)
+                // {
+                //     Debug.Log($"Player: {score.player_name}, Score: {score.score}, Created At: {score.created_at}, Updated At: {score.updated_at}");
+                // }
+            }
+        }
+    }
+
+    // 包装 JSON 数组为对象
+    private string WrapJsonArray(string jsonArray)
+    {
+        return "{\"scores\":" + jsonArray + "}";
     }
 }
