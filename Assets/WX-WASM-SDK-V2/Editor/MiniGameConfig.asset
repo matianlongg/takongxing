@@ -19,7 +19,7 @@ MonoBehaviour:
     assetLoadType: 0
     compressDataPackage: 1
     VideoUrl: 
-    DST: C:/workspace/unity-work/wx_takongxing_prod/takongxing/wx_build
+    DST: C:/work-space/unity-work/wx_old/wx_old/wx_build
     StreamCDN: 
     bundleHashLength: 32
     bundlePathIdentifier: StreamingAssets;
