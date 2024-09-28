@@ -4,12 +4,13 @@ using UnityEngine;
 using System.Collections;
 using UnityEngine.SceneManagement;
 using UnityEngine.Networking;
+using TMPro;
 
 [RequireComponent(typeof(APCharacterController))]
 [AddComponentMenu("Advanced Platformer 2D/Samples/APSamplePlayer")]
 
 // Sample for handling Player behavior when being hit + simple life system
-public class APSamplePlayer : MonoBehaviour 
+public class APSamplePlayer : MonoBehaviour
 {
 	////////////////////////////////////////////////////////
 	// PUBLIC/HIGH LEVEL
@@ -22,6 +23,8 @@ public class APSamplePlayer : MonoBehaviour
 	public float m_waitTimeAfterDie = 0f;					// time to wait before reseting level after dying (to allows die animation to play)
 	public string m_animDie;								// state of animation die
 	public GameObject gameOverPanel;                       // Reference to the Game Over UI Panel
+	public RandomNameGenerator randomNameGenerator;
+	public TMP_InputField nickNameInputField;
 
 	////////////////////////////////////////////////////////
 	// PRIVATE/LOW LEVEL
@@ -179,7 +182,6 @@ public class APSamplePlayer : MonoBehaviour
 		m_life = 0f;
 		m_player.IsControlled = true; // prevent any more action from player
 		m_refreshGui = true;
-		
 		// play animation if exists
 		if(!string.IsNullOrEmpty(m_animDie))
 		{
@@ -198,64 +200,14 @@ public class APSamplePlayer : MonoBehaviour
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(true);
-			UploadScoreToCloud(); // 假设 currentScore 是当前得分的变量
+
+			nickNameInputField.text = randomNameGenerator.GenerateInputNames();
+			// UploadScoreToCloud(); // 假设 currentScore 是当前得分的变量
 
         }
     }
 
-	void UploadScoreToCloud()
-	{
-		// 这里是上传得分的逻辑，可能涉及网络请求
-		// 例如使用UnityWebRequest发送HTTP请求到你的云服务
-		StartCoroutine(SubmitScoreCoroutine());
-	}
 
-	private IEnumerator SubmitScoreCoroutine()
-    {
-        // 创建 JSON 数据
-		ScoreData data = new ScoreData("checnh", 5);
-    	string jsonData = JsonUtility.ToJson(data);
-		Debug.Log(jsonData);
-
-        // using (UnityWebRequest www = UnityWebRequest.PostWwwForm("http://localhost:5000/submit_score", jsonData))
-        // {
-        //     www.SetRequestHeader("Content-Type", "application/json");
-
-        //     // 发送请求并等待响应
-        //     yield return www.SendWebRequest();
-
-        //     if (www.result != UnityWebRequest.Result.Success)
-        //     {
-        //         Debug.LogError("Error submitting score: " + www.error);
-        //     }
-        //     else
-        //     {
-        //         Debug.Log("Score submitted successfully!");
-        //         // 在这里可以更新 UI 或其他逻辑
-        //     }
-        // }
-
-		using (UnityWebRequest www = new UnityWebRequest("http://localhost:5000/submit_score", "POST"))
-		{
-			byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
-			www.uploadHandler = new UploadHandlerRaw(bodyRaw);
-			www.downloadHandler = new DownloadHandlerBuffer();
-			www.SetRequestHeader("Content-Type", "application/json");
-
-			// 发送请求并等待响应
-			yield return www.SendWebRequest();
-
-			if (www.result != UnityWebRequest.Result.Success)
-			{
-				Debug.LogError("Error submitting score: " + www.error);
-			}
-			else
-			{
-				Debug.Log("Score submitted successfully!");
-				Debug.Log("Response: " + www.downloadHandler.text);  // 输出接口返回值
-			}
-		}
-    }
 
 	IEnumerator RestartLevel () 
 	{

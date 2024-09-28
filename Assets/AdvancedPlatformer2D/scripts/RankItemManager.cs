@@ -12,7 +12,7 @@ public class RankItemManager : MonoBehaviour
     public float itemHeight = 100f;
 
     // 方法来动态添加一个新的 RankItem
-    public void AddRankItem(int rank, string name, int score)
+    public void AddRankItem(int rank, string name, float score)
     {
         // 生成一个新的 RankItem 实例
         GameObject newRankItem = Instantiate(rankItemPrefab, gridTransform);

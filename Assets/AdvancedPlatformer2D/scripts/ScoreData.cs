@@ -2,12 +2,12 @@
 public class ScoreData
 {
     public string player_name;
-    public int score;
+    public float score;
 
     public string created_at;
     public string updated_at;
 
-    public ScoreData(string playerName, int score)
+    public ScoreData(string playerName, float score)
     {
         this.player_name = playerName;
         this.score = score;
