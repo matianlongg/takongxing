@@ -1,8 +1,30 @@
+import base64
+import json
 from flask import Flask, request, jsonify
 import psycopg2
 from psycopg2 import sql
+import base64
+from Crypto.Cipher import AES
 
 app = Flask(__name__)
+
+ENCRYPTION_KEY = b'urDw32mgb9DZ5Fv3V5AvhwcM'  # 必须是16, 24 或 32 bytes
+
+def decrypt_data(encrypted_data):
+    encrypted_data_bytes = base64.b64decode(encrypted_data)
+
+    # 提取IV和加密的正文
+    iv = encrypted_data_bytes[:16]
+    encrypted_message = encrypted_data_bytes[16:]
+
+    cipher = AES.new(ENCRYPTION_KEY, AES.MODE_CBC, iv)
+    decrypted_message = cipher.decrypt(encrypted_message)
+
+    # 去除填充
+    unpadded_message = decrypted_message[:-decrypted_message[-1]]
+    
+    return unpadded_message.decode('utf-8')
+
 
 # PostgreSQL 数据库连接参数
 DATABASE = {
@@ -32,8 +54,15 @@ def init_db():
 
 @app.route('/submit_score', methods=['POST'])
 def submit_score():
-    data = request.get_json()
-    print(data)
+    encrypted_data = request.get_data(as_text=True)
+
+    try:
+        # 解密数据
+        decrypted_data = decrypt_data(encrypted_data)
+        data = json.loads(decrypted_data)
+    except Exception as e:
+        return jsonify({'error': 'Invalid encrypted data or decryption failed'}), 400
+    
     player_name = data.get('player_name')
     score = data.get('score')
 

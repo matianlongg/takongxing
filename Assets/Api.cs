@@ -1,27 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using System.Security.Cryptography;
+using System.Text;
 
 public class Api : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    private string encryptionKey = "urDw32mgb9DZ5Fv3V5AvhwcM"; // 16, 24, or 32 bytes long key for AES
 
     public void UploadScoreToCloud(string playerName, float score)
     {
-        // 这里是上传得分的逻辑，可能涉及网络请求
-        // 例如使用UnityWebRequest发送HTTP请求到你的云服务
         StartCoroutine(SubmitScoreCoroutine(playerName, score));
     }
 
@@ -31,10 +21,13 @@ public class Api : MonoBehaviour
         ScoreData data = new ScoreData(playerName, score);
         string jsonData = JsonUtility.ToJson(data);
 
+        // 加密数据
+        string encryptedData = EncryptData(jsonData);
 
-        using (UnityWebRequest www = new UnityWebRequest("http://localhost:5000/submit_score", "POST"))
+        // 创建上传请求
+        using (UnityWebRequest www = new UnityWebRequest("http://127.0.0.1:5000/submit_score", "POST"))
         {
-            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonData);
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(encryptedData);
             www.uploadHandler = new UploadHandlerRaw(bodyRaw);
             www.downloadHandler = new DownloadHandlerBuffer();
             www.SetRequestHeader("Content-Type", "application/json");
@@ -49,7 +42,31 @@ public class Api : MonoBehaviour
             else
             {
                 Debug.Log("Score submitted successfully!");
-                Debug.Log("Response: " + www.downloadHandler.text);  // 输出接口返回值
+                Debug.Log("Response: " + www.downloadHandler.text);
+            }
+        }
+    }
+
+    private string EncryptData(string plainText)
+    {
+        using (Aes aes = Aes.Create())
+        {
+            aes.Key = Encoding.UTF8.GetBytes(encryptionKey);
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
+            aes.GenerateIV(); // 初始化向量
+
+            using (var encryptor = aes.CreateEncryptor(aes.Key, aes.IV))
+            {
+                byte[] plainBytes = Encoding.UTF8.GetBytes(plainText);
+                byte[] encryptedBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
+
+                // 将IV和密文组合成最终加密数据（转换为Base64）
+                byte[] result = new byte[aes.IV.Length + encryptedBytes.Length];
+                Buffer.BlockCopy(aes.IV, 0, result, 0, aes.IV.Length);
+                Buffer.BlockCopy(encryptedBytes, 0, result, aes.IV.Length, encryptedBytes.Length);
+
+                return Convert.ToBase64String(result);
             }
         }
     }
