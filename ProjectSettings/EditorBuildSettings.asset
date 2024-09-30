@@ -6,12 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/AdvancedPlatformer2D/scenes/Main.unity
-    guid: 82892047e9aca1249b07b4ed20c922dd
-  - enabled: 1
-    path: Assets/AdvancedPlatformer2D/scenes/Basics Infinite.unity
-    guid: 7efdaf02a0a4a564abd655cb21be5649
-  - enabled: 1
-    path: Assets/AdvancedPlatformer2D/scenes/RankList.unity
-    guid: 76ff60f7616029e489d2cb239a7a5f48
+    path: Assets/Scenes/SampleScene.unity
+    guid: 2cda990e2423bbf4892e6590ba056729
   m_configObjects: {}
