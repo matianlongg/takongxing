@@ -1,4 +1,0 @@
-repository "wx_old@mtl1994@cloud.cn"
-  path "/"
-    br "/main"
-    co "/main"
